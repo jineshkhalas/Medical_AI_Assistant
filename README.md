@@ -1,4 +1,4 @@
----
+---
 title: Medical QA API
 emoji: ⚕️
 colorFrom: blue
@@ -10,7 +10,7 @@ app_port: 7860
 # Agentic Medical Assistant Chatbot
 
 ## About
-The Agentic Medical Assistant is an intelligent healthcare chatbot designed to provide accurate medical information. It combines semantic search over a curated local dataset with specialized Medical Named Entity Recognition (NER), a local LLM, and a live web search fallback. 
+The Agentic Medical Assistant is an intelligent healthcare chatbot designed to provide accurate medical information. It combines semantic search over a curated local dataset with specialized Medical Named Entity Recognition (NER), the **Google Gemini API**, and a live web search fallback. 
 
 It features a modern **React (Vite) frontend** integrated with **Supabase** for user authentication and chat history persistence, communicating with a high-performance **FastAPI backend** that drives the AI brain.
 
@@ -18,11 +18,12 @@ It features a modern **React (Vite) frontend** integrated with **Supabase** for 
 
 ## Features
 - **Secure Authentication & Session History**: Powered by Supabase to handle user sign-ups, profile management, and securely persist consultation histories.
-- **Strict Medical Guardrails**: Automatic domain classification using Llama 3 to deflect non-medical requests.
+- **Strict Medical Guardrails**: Automatic domain classification using Google Gemini API to deflect non-medical requests.
 - **Biomedical Entity Extraction**: Utilizes SciSpaCy (`en_core_sci_sm`) to identify and extract medical terms from user inquiries.
 - **Hybrid Semantic Search**: Uses Sentence-Transformers (`all-MiniLM-L6-v2`) to compute text embeddings and query the local medical dataset.
 - **Smart Web Synthesis Fallback**: Automatically searches the live web via DuckDuckGo and synthesizes external facts if local dataset similarity is below `0.65`.
 - **Modern UI/UX**: Responsive, dark-themed dashboard built with React 19 (Vite) and optimized CSS.
+- **Cloud-Ready & Fully Deployed**: Pre-configured to deploy the React frontend on Vercel and the FastAPI backend on Hugging Face Spaces using Docker.
 
 ---
 
@@ -35,7 +36,7 @@ It features a modern **React (Vite) frontend** integrated with **Supabase** for 
 
 ### Backend
 - **Framework**: FastAPI (Python)
-- **LLM Engine**: Ollama (Llama 3) for domain classification and expert medical answers synthesis
+- **LLM Engine**: Google Gemini API (`gemini-3.5-flash`) for domain classification and expert medical answers synthesis
 - **Vector Search**: Sentence-Transformers (`all-MiniLM-L6-v2`) for semantic search of dataset
 - **Clinical NLP & NER**: [SciSpaCy](https://allenai.github.io/scispacy/) (`en_core_sci_sm`) to extract biomedical entities
 - **Search API**: DuckDuckGo Search (DDGS) as web fallback
@@ -46,7 +47,7 @@ It features a modern **React (Vite) frontend** integrated with **Supabase** for 
 ## How it Works
 1. **User Authentication**: Users sign up or sign in securely via Supabase.
 2. **Conversation Persistence**: Once authenticated, the frontend fetches previous chat logs from Supabase.
-3. **Query Guardrail**: When the user sends a query, the FastAPI backend uses Llama 3 to classify if the query is medical. Non-medical queries are deflected.
+3. **Query Guardrail**: When the user sends a query, the FastAPI backend uses Gemini to classify if the query is medical. Non-medical queries are deflected.
 4. **Clinical NER**: SciSpaCy extracts medical terms from the query.
 5. **Semantic Search**: The backend computes query embeddings and searches a local CSV dataset (`MedQA_Clean_Dataset.csv`) using cosine similarity.
    - **Confidence Score >= 0.65**: The closest matches are extracted and used to synthesize an answer.
@@ -68,6 +69,7 @@ MedicalQA_Chatbot/
 │   └── requirements.txt        # Backend dependencies
 ├── frontend/
 │   ├── .env                    # Frontend environment keys (Supabase keys)
+│   ├── .gitignore              # Ignores local Vercel configs
 │   ├── index.html              # Entry HTML file
 │   ├── package.json            # Node dependencies and scripts
 │   ├── vite.config.js          # Vite compilation settings
@@ -78,7 +80,8 @@ MedicalQA_Chatbot/
 │       ├── index.css           # Global typography & root variables
 │       ├── main.jsx            # React root component hydration
 │       └── supabaseClient.js   # Supabase client setup
-├── .gitignore                  # Git ignore patterns
+├── .gitignore                  # Root Git ignore patterns
+├── Dockerfile                  # Root Dockerfile for Hugging Face Spaces deployment
 └── README.md                   # Project documentation
 ```
 
@@ -116,7 +119,7 @@ create policy "Users can delete their own chats" on chats
   for delete using (auth.uid() = user_id);
 ```
 
-### 2. Backend Setup
+### 2. Backend Setup (Local Run)
 1. Open a terminal and navigate to the backend folder:
    ```bash
    cd backend
@@ -129,28 +132,22 @@ create policy "Users can delete their own chats" on chats
    # On macOS/Linux:
    source venv/bin/activate
    ```
-3. Install backend packages:
+3. Install dependencies:
    ```bash
    pip install -r requirements.txt
-   ```
-4. Install FastAPI, Uvicorn, and Python-Dotenv (if not in requirements.txt):
-   ```bash
-   pip install fastapi uvicorn python-dotenv
-   ```
-5. Install the SciSpaCy pipeline:
-   ```bash
+   pip install fastapi uvicorn python-dotenv google-generativeai
    pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.4/en_core_sci_sm-0.5.4.tar.gz
    ```
-6. Make sure **Ollama** is running locally and has Llama 3 pulled:
-   ```bash
-   ollama pull llama3
+4. Create a `.env` file inside the `backend` folder and add your Google Gemini API key:
+   ```env
+   GEMINI_API_KEY=your_google_gemini_api_key
    ```
-7. Run the backend API:
+5. Run the backend API:
    ```bash
    uvicorn api:app --reload --port 8000
    ```
 
-### 3. Frontend Setup
+### 3. Frontend Setup (Local Run)
 1. Open a new terminal and navigate to the frontend folder:
    ```bash
    cd frontend
@@ -159,7 +156,7 @@ create policy "Users can delete their own chats" on chats
    ```bash
    npm install
    ```
-3. Create a `.env` file in the `frontend` folder with your Supabase credentials:
+3. Create a `.env` file in the `frontend` folder with your Supabase credentials and local API URL:
    ```env
    VITE_SUPABASE_URL=your_supabase_project_url
    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
@@ -169,6 +166,29 @@ create policy "Users can delete their own chats" on chats
    ```bash
    npm run dev
    ```
+
+---
+
+## Cloud Deployment Guide
+
+### 1. Backend: Hugging Face Spaces (Docker)
+The backend is packaged inside a root `Dockerfile` to deploy seamlessly to a free Hugging Face Space.
+1. Create a **Docker** Space on Hugging Face using the **Blank** template.
+2. Link your repository and push to the Hugging Face git remote (`hf`):
+   ```bash
+   git push hf main
+   ```
+3. In your Space **Settings**, add a secret variable named `GEMINI_API_KEY` containing your Google AI Studio API key.
+4. Your backend API will boot up and be accessible under `https://your-username-medical-qa-api.hf.space`.
+
+### 2. Frontend: Vercel
+1. Import your GitHub repository into **Vercel**.
+2. Set the **Root Directory** to `frontend`.
+3. Configure these environment variables under settings:
+   - `VITE_SUPABASE_URL` = *(Your Supabase Project URL)*
+   - `VITE_SUPABASE_ANON_KEY` = *(Your Supabase Anon API Key)*
+   - `VITE_API_URL` = `https://your-username-medical-qa-api.hf.space` *(Your Hugging Face Space URL)*
+4. Click **Deploy**.
 
 ---
 

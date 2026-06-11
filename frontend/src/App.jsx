@@ -52,18 +52,23 @@ function renderMarkdown(text) {
   html = html.replace(/^## (.*?)$/gm, '<h2>$1</h2>');
   html = html.replace(/^# (.*?)$/gm, '<h1>$1</h1>');
 
-  // Convert Bullet points (starting with * or - or •)
-  html = html.replace(/^\s*[\*\-\u2022]\s+(.*?)$/gm, '<li>$1</li>');
+  // Convert Bullet points (starting with * or - or • or +)
+  html = html.replace(/^\s*[\*\-\+\u2022]\s+(.*?)$/gm, '<li>$1</li>');
 
-  // Wrap list items in <ul>. Clean up consecutive lists.
+  // Convert Numbered lists (starting with digits like 1. or 2.)
+  html = html.replace(/^\s*\d+\.\s+(.*?)$/gm, '<li class="num-li">$1</li>');
+
+  // Wrap list items in <ul> or <ol>. Clean up consecutive lists.
   html = html.replace(/((?:<li>.*?<\/li>\s*)+)/g, '<ul>$1</ul>');
+  html = html.replace(/((?:<li class="num-li">.*?<\/li>\s*)+)/g, '<ol>$1</ol>');
 
   // Convert newlines to paragraphs / line breaks
   html = html.replace(/\n/g, '<br />');
 
   // Clean up empty lines or double breaks inside list wraps
-  html = html.replace(/<br \/>\s*(<\/li>|<li>|<ul>|<\/ul>)/g, '$1');
-  html = html.replace(/(<\/li>|<li>|<ul>|<\/ul>)\s*<br \/>/g, '$1');
+  html = html.replace(/<br \/>\s*(<\/li>|<li>|<ul>|<\/ul>|<ol>|<\/ol>)/g, '$1');
+  html = html.replace(/(<\/li>|<li>|<ul>|<\/ul>|<ol>|<\/ol>)\s*<br \/>/g, '$1');
+  html = html.replace(/<li class="num-li">/g, '<li>');
 
   return html;
 }

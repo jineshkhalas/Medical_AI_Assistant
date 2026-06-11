@@ -601,6 +601,12 @@ body {
   list-style-type: disc;
 }
 
+.msg-body .text ol {
+  padding-left: 20px;
+  margin: 8px 0 12px 0;
+  list-style-type: decimal;
+}
+
 .msg-body .text li {
   margin-bottom: 6px;
   line-height: 1.5;

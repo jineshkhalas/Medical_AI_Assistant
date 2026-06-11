@@ -1,7 +1,10 @@
 import pandas as pd
 from sentence_transformers import SentenceTransformer, util
 import spacy
-from duckduckgo_search import DDGS
+try:
+    from ddgs import DDGS
+except ImportError:
+    from duckduckgo_search import DDGS
 import google.generativeai as genai
 import os
 from dotenv import load_dotenv

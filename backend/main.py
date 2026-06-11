@@ -121,8 +121,13 @@ def synthesize_answer(user_query, context, source_name):
     
     Your Task:
     1. Read the retrieved context to see if it contains useful facts.
-    2. Write a single, highly readable, grammatically correct answer to the user's question.
-    3. If the context contains good information, use it. If the context is irrelevant garbage, ignore it and simply answer the user's question using your own expert medical knowledge.
+    2. Write a structured, highly readable, grammatically correct answer to the user's question.
+    3. Format your response clearly using markdown:
+       - Use headings (###) for logical sections.
+       - Use bullet points (-) or numbered lists for lists of symptoms, diagnostics, treatments, or steps.
+       - Use bold text (**text**) for important terms.
+       - Break your response into separate paragraphs (use double newlines). Do not merge everything into a single paragraph.
+    4. If the context contains good information, use it. If the context is irrelevant garbage, ignore it and simply answer the user's question using your own expert medical knowledge.
     """
     
     try:

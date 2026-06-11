@@ -1,4 +1,13 @@
-# Agentic Medical Assistant Chatbot
+---
+title: Medical QA API
+emoji: ⚕️
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 7860
+---
+
+# Agentic Medical Assistant Chatbot
 
 ## About
 The Agentic Medical Assistant is an intelligent healthcare chatbot designed to provide accurate medical information. It combines semantic search over a curated local dataset with specialized Medical Named Entity Recognition (NER), a local LLM, and a live web search fallback. 

@@ -1,0 +1,8 @@
+streamlit
+pandas
+sentence-transformers
+spacy
+scispacy
+ddgs
+google-generativeai
+python-dotenv

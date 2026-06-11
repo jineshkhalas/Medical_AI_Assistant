@@ -6,3 +6,4 @@ scispacy
 ddgs
 google-generativeai
 python-dotenv
+groq

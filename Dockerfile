@@ -13,7 +13,7 @@ ENV HOME=/home/user \
 # Copy requirements and install dependencies
 COPY --chown=user backend/requirements.txt .
 RUN pip install --no-cache-dir --upgrade -r requirements.txt \
-    && pip install --no-cache-dir fastapi uvicorn python-dotenv google-generativeai \
+    && pip install --no-cache-dir fastapi uvicorn python-dotenv groq \
     && pip install --no-cache-dir https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.4/en_core_sci_sm-0.5.4.tar.gz
 
 # Copy backend files to work directory with correct ownership

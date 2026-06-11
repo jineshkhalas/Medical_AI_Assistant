@@ -5,14 +5,14 @@ try:
     from ddgs import DDGS
 except ImportError:
     from duckduckgo_search import DDGS
-import google.generativeai as genai
+from groq import Groq
 import os
 from dotenv import load_dotenv
 import re
 import json
 
 load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env'))
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 
 def setup_chatbot_brain(csv_path):
@@ -61,12 +61,15 @@ def is_medical_query(user_query):
     """
     
     try:
-        model = genai.GenerativeModel("gemini-3.5-flash")
-        response = model.generate_content(
-            prompt,
-            generation_config={"response_mime_type": "application/json"}
+        completion = groq_client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.0,
+            response_format={"type": "json_object"}
         )
-        content = response.text.strip()
+        content = completion.choices[0].message.content.strip()
         
         try:
             json_match = re.search(r'\{.*\}', content, re.DOTALL)
@@ -86,7 +89,7 @@ def is_medical_query(user_query):
         return True
         
     except Exception as e:
-        print(f"Gemini Guardrail Error: {e}")
+        print(f"Groq Guardrail Error: {e}")
         return True
 
 def search_the_web(query):
@@ -107,7 +110,7 @@ def search_the_web(query):
         return None
 
 def synthesize_answer(user_query, context, source_name):
-    print(f"Synthesizing and verifying answer using Gemini ({source_name})...")
+    print(f"Synthesizing and verifying answer using Llama 3 via Groq ({source_name})...")
     
     prompt = f"""
     You are a highly intelligent medical AI assistant.
@@ -123,11 +126,16 @@ def synthesize_answer(user_query, context, source_name):
     """
     
     try:
-        model = genai.GenerativeModel("gemini-3.5-flash")
-        response = model.generate_content(prompt)
-        return response.text.strip()
+        completion = groq_client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.3
+        )
+        return completion.choices[0].message.content.strip()
     except Exception as e:
-        return f"*(Note: Gemini API failed. Error: {e})*\n\n{context}"
+        return f"*(Note: Groq API failed. Error: {e})*\n\n{context}"
 
 def ask_question(user_query, df, model, database_embeddings, ner_model):
     

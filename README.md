@@ -10,7 +10,7 @@ app_port: 7860
 # Agentic Medical Assistant Chatbot
 
 ## About
-The Agentic Medical Assistant is an intelligent healthcare chatbot designed to provide accurate medical information. It combines semantic search over a curated local dataset with specialized Medical Named Entity Recognition (NER), the **Google Gemini API**, and a live web search fallback. 
+The Agentic Medical Assistant is an intelligent healthcare chatbot designed to provide accurate medical information. It combines semantic search over a curated local dataset with specialized Medical Named Entity Recognition (NER), the **Groq API (Llama 3)**, and a live web search fallback. 
 
 It features a modern **React (Vite) frontend** integrated with **Supabase** for user authentication and chat history persistence, communicating with a high-performance **FastAPI backend** that drives the AI brain.
 
@@ -18,7 +18,7 @@ It features a modern **React (Vite) frontend** integrated with **Supabase** for 
 
 ## Features
 - **Secure Authentication & Session History**: Powered by Supabase to handle user sign-ups, profile management, and securely persist consultation histories.
-- **Strict Medical Guardrails**: Automatic domain classification using Google Gemini API to deflect non-medical requests.
+- **Strict Medical Guardrails**: Automatic domain classification using Llama 3 via Groq to deflect non-medical requests.
 - **Biomedical Entity Extraction**: Utilizes SciSpaCy (`en_core_sci_sm`) to identify and extract medical terms from user inquiries.
 - **Hybrid Semantic Search**: Uses Sentence-Transformers (`all-MiniLM-L6-v2`) to compute text embeddings and query the local medical dataset.
 - **Smart Web Synthesis Fallback**: Automatically searches the live web via DuckDuckGo and synthesizes external facts if local dataset similarity is below `0.65`.
@@ -36,7 +36,7 @@ It features a modern **React (Vite) frontend** integrated with **Supabase** for 
 
 ### Backend
 - **Framework**: FastAPI (Python)
-- **LLM Engine**: Google Gemini API (`gemini-3.5-flash`) for domain classification and expert medical answers synthesis
+- **LLM Engine**: Groq API (`llama-3.3-70b-versatile`) for domain classification and expert medical answers synthesis
 - **Vector Search**: Sentence-Transformers (`all-MiniLM-L6-v2`) for semantic search of dataset
 - **Clinical NLP & NER**: [SciSpaCy](https://allenai.github.io/scispacy/) (`en_core_sci_sm`) to extract biomedical entities
 - **Search API**: DuckDuckGo Search (DDGS) as web fallback
@@ -47,7 +47,7 @@ It features a modern **React (Vite) frontend** integrated with **Supabase** for 
 ## How it Works
 1. **User Authentication**: Users sign up or sign in securely via Supabase.
 2. **Conversation Persistence**: Once authenticated, the frontend fetches previous chat logs from Supabase.
-3. **Query Guardrail**: When the user sends a query, the FastAPI backend uses Gemini to classify if the query is medical. Non-medical queries are deflected.
+3. **Query Guardrail**: When the user sends a query, the FastAPI backend uses Llama 3 via Groq to classify if the query is medical. Non-medical queries are deflected.
 4. **Clinical NER**: SciSpaCy extracts medical terms from the query.
 5. **Semantic Search**: The backend computes query embeddings and searches a local CSV dataset (`MedQA_Clean_Dataset.csv`) using cosine similarity.
    - **Confidence Score >= 0.65**: The closest matches are extracted and used to synthesize an answer.
@@ -60,7 +60,7 @@ It features a modern **React (Vite) frontend** integrated with **Supabase** for 
 ```text
 MedicalQA_Chatbot/
 ├── backend/
-│   ├── .env                    # Environment variables (GEMINI_API_KEY)
+│   ├── .env                    # Environment variables (GROQ_API_KEY)
 │   ├── api.py                  # FastAPI Application Entrypoint
 │   ├── main.py                 # Core AI Logic & Terminal Mode
 │   ├── data_prep.py            # Dataset cleaning and preprocessing script
@@ -135,12 +135,12 @@ create policy "Users can delete their own chats" on chats
 3. Install dependencies:
    ```bash
    pip install -r requirements.txt
-   pip install fastapi uvicorn python-dotenv google-generativeai
+   pip install fastapi uvicorn python-dotenv groq
    pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.4/en_core_sci_sm-0.5.4.tar.gz
    ```
-4. Create a `.env` file inside the `backend` folder and add your Google Gemini API key:
+4. Create a `.env` file inside the `backend` folder and add your Groq API key:
    ```env
-   GEMINI_API_KEY=your_google_gemini_api_key
+   GROQ_API_KEY=your_groq_api_key
    ```
 5. Run the backend API:
    ```bash
@@ -178,7 +178,7 @@ The backend is packaged inside a root `Dockerfile` to deploy seamlessly to a fre
    ```bash
    git push hf main
    ```
-3. In your Space **Settings**, add a secret variable named `GEMINI_API_KEY` containing your Google AI Studio API key.
+3. In your Space **Settings**, add a secret variable named `GROQ_API_KEY` containing your Groq API key.
 4. Your backend API will boot up and be accessible under `https://your-username-medical-qa-api.hf.space`.
 
 ### 2. Frontend: Vercel

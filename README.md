@@ -6,17 +6,20 @@ colorTo: indigo
 sdk: docker
 app_port: 7860
 ---
-
 # Agentic Medical Assistant Chatbot
 
+**Live Demo:** [https://medical-ai-assistant-jk.vercel.app/](https://medical-ai-assistant-jk.vercel.app/)
+
 ## About
-The Agentic Medical Assistant is an intelligent healthcare chatbot designed to provide accurate medical information. It combines semantic search over a curated local dataset with specialized Medical Named Entity Recognition (NER), the **Groq API (Llama 3)**, and a live web search fallback. 
+
+The Agentic Medical Assistant is an intelligent healthcare chatbot designed to provide accurate medical information. It combines semantic search over a curated local dataset with specialized Medical Named Entity Recognition (NER), the **Groq API (Llama 3)**, and a live web search fallback.
 
 It features a modern **React (Vite) frontend** integrated with **Supabase** for user authentication and chat history persistence, communicating with a high-performance **FastAPI backend** that drives the AI brain.
 
 ---
 
 ## Features
+
 - **Secure Authentication & Session History**: Powered by Supabase to handle user sign-ups, profile management, and securely persist consultation histories.
 - **Strict Medical Guardrails**: Automatic domain classification using Llama 3 via Groq to deflect non-medical requests.
 - **Biomedical Entity Extraction**: Utilizes SciSpaCy (`en_core_sci_sm`) to identify and extract medical terms from user inquiries.
@@ -30,11 +33,13 @@ It features a modern **React (Vite) frontend** integrated with **Supabase** for 
 ## Architecture & Tech Stack
 
 ### Frontend
+
 - **Framework**: React 19 (via Vite)
 - **Styling**: Vanilla CSS (Modern, dark-themed responsive UI with smooth transitions)
 - **Database & Auth**: [Supabase](https://supabase.com) (handles sign-up, sign-in, user profiles, and secure storage of conversational histories)
 
 ### Backend
+
 - **Framework**: FastAPI (Python)
 - **LLM Engine**: Groq API (`llama-3.3-70b-versatile`) for domain classification and expert medical answers synthesis
 - **Vector Search**: Sentence-Transformers (`all-MiniLM-L6-v2`) for semantic search of dataset
@@ -45,6 +50,7 @@ It features a modern **React (Vite) frontend** integrated with **Supabase** for 
 ---
 
 ## How it Works
+
 1. **User Authentication**: Users sign up or sign in securely via Supabase.
 2. **Conversation Persistence**: Once authenticated, the frontend fetches previous chat logs from Supabase.
 3. **Query Guardrail**: When the user sends a query, the FastAPI backend uses Llama 3 via Groq to classify if the query is medical. Non-medical queries are deflected.
@@ -57,6 +63,7 @@ It features a modern **React (Vite) frontend** integrated with **Supabase** for 
 ---
 
 ## Project Structure
+
 ```text
 MedicalQA_Chatbot/
 ├── backend/
@@ -90,9 +97,12 @@ MedicalQA_Chatbot/
 ## Setup & Running the Application
 
 ### 1. Supabase Database Configuration
+
 Before running the frontend, set up a Supabase project and create a `chats` table.
+
 1. Create a new project in [Supabase](https://supabase.com).
 2. Go to the **SQL Editor** and run the following script to create the table and enable Row Level Security (RLS):
+
 ```sql
 create table chats (
   id uuid primary key default gen_random_uuid(),
@@ -120,6 +130,7 @@ create policy "Users can delete their own chats" on chats
 ```
 
 ### 2. Backend Setup (Local Run)
+
 1. Open a terminal and navigate to the backend folder:
    ```bash
    cd backend
@@ -148,6 +159,7 @@ create policy "Users can delete their own chats" on chats
    ```
 
 ### 3. Frontend Setup (Local Run)
+
 1. Open a new terminal and navigate to the frontend folder:
    ```bash
    cd frontend
@@ -172,7 +184,9 @@ create policy "Users can delete their own chats" on chats
 ## Cloud Deployment Guide
 
 ### 1. Backend: Hugging Face Spaces (Docker)
+
 The backend is packaged inside a root `Dockerfile` to deploy seamlessly to a free Hugging Face Space.
+
 1. Create a **Docker** Space on Hugging Face using the **Blank** template.
 2. Link your repository and push to the Hugging Face git remote (`hf`):
    ```bash
@@ -182,6 +196,7 @@ The backend is packaged inside a root `Dockerfile` to deploy seamlessly to a fre
 4. Your backend API will boot up and be accessible under `https://your-username-medical-qa-api.hf.space`.
 
 ### 2. Frontend: Vercel
+
 1. Import your GitHub repository into **Vercel**.
 2. Set the **Root Directory** to `frontend`.
 3. Configure these environment variables under settings:
@@ -193,6 +208,7 @@ The backend is packaged inside a root `Dockerfile` to deploy seamlessly to a fre
 ---
 
 ## Example Queries
+
 - *What are the primary symptoms and diagnostic tests for Type 2 Diabetes?*
 - *Explain the side effects and drug interactions of Lisinopril.*
 - *What is the standard recommended treatment and recovery time for a common cold?*
@@ -200,7 +216,9 @@ The backend is packaged inside a root `Dockerfile` to deploy seamlessly to a fre
 ---
 
 ## Author
+
 Jinesh Khalas
 
 ---
+
 *Disclaimer: This is an AI assistant for informational purposes only and does not replace professional medical advice.*
